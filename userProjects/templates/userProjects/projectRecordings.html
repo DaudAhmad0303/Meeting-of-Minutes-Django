@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+    <title>Project Files</title>
+</head>
+
+<body>
+    <div class="text-end mx-5 mt-4">
+        <a href="#" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#uploadRecording">Upload Recording</a>
+        <a href="{% url 'LOG_OUT' %}" class="btn btn-danger mx-2">Log Out</a>
+    </div>
+    <div class="modal fade text-start" id="uploadRecording" data-bs-backdrop="static" data-bs-keyboard="false"
+        tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bolder" id="staticBackdropLabel">
+                        Upload Recording</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form class="uploadRecordings" id="uploadRecordings" method="POST" autocomplete="off" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="userFiles" class="form-label">Upload Recordings</label>
+                            <input class="form-control" type="file" id="formFileMultiple" multiple name="userFiles" required>
+                        </div>
+                        <button type="submit" class="btn btn-success text-light ms-2 mt-3">Upload</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% if recordings|length > 0 %}
+        <table class="table mt-5 text-center" style="width: 80%; margin-left:auto;margin-right:auto;">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Path</th>
+                    <th scope="col">Delete</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for recording in recordings %}
+                <tr>
+                    <th scope="row">{{forloop.counter}}</th>
+                    <td>{{recording.fileName}}</td>
+                    <td>{{recording.myRecording}}</td>
+                    <td>
+                        <form class="deleteRecording" method="POST">
+                            {% csrf_token %}
+                            <input type="hidden" id="recordingID" name="recordingID" value="{{recording.id}}">
+                            <button type="submit" class="btn btn-danger">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+    <script>
+        $(".deleteRecording").submit(function (e) {
+            let result = confirm("User Recording will be deleted. !");
+            if (result) {
+                $.post("/deleteRecordingFile", $(this).serialize(), function (data) {
+                    validData = JSON.parse(data);
+                    if (validData.message == 0) {
+                        swal("Deleted!", "Your Recording has been deleted.", "success").then(function () {
+                            location.reload();
+                        });
+                    }
+                    else if (validData.message == -1) {
+                        swal("Error", "Something went wrong", "error");
+                    }
+                    else if (validData.message == -2) {
+                        swal("Expired", "User Session has been expired !", "error").then(function () {
+                          window.location.href = ("{% url 'sign_In_ULR' %}");
+                        });
+                    }
+                });
+            }
+            e.preventDefault();
+        });
+        $("#uploadRecordings").submit(function (e) {
+            var recvData;
+            var formData = new FormData(uploadRecordings);
+            $.ajax({   
+            url: "/userProjectMeetings/{{projectId}}",    
+            type: 'POST',
+            data: formData,
+            async: false,
+            cache: false,
+            contentType: false,
+            enctype: 'multipart/form-data',
+            processData: false,
+            success: function (data) {
+                recvData=data;
+            },
+            error: function(data) {
+                recvData=null;
+            }
+            }).done(function(){
+
+                validData = JSON.parse(recvData);
+                if(validData.message==1)
+                {
+                    swal("Error", "Session Expired", "error").then(function(){
+                        window.location.href = ("{% url 'sign_In_ULR' %}");
+                    });
+                }
+                else {
+                    swal("Created !","Project created successfully !","success").then(function()
+                    {
+                        location.reload();
+                    });
+                }
+            });
+            return false;
+        });
+      </script>
+    <!-- Optional JavaScript; choose one of the two! -->
+
+    <!-- Option 1: Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+
+    <!-- Option 2: Separate Popper and Bootstrap JS -->
+    <!--
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
+    -->
+</body>
+
+</html>

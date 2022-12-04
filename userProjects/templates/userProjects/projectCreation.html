@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+    <title>Create Project</title>
+  </head>
+  <body>
+    <div class="text-end mx-5 mt-4">
+      <a href="{% url 'LOG_OUT' %}" class="btn btn-danger">Log Out</a>
+    </div>
+    <h4 class="mx-5 mt-4 fw-bold text-success">Create Project</h4>
+    <form class="px-5 mt-4" id="form" method="POST">
+        {% csrf_token %}
+        <div class="mb-4">
+          <label for="projectName" class="form-label">Project Name</label>
+          <input type="text" class="form-control" id="projectName" name="projectName" required>
+        </div>
+        <button type="submit" class="btn btn-success">Create</button>
+      </form>
+      <script>
+        $("#form").submit(function (e) {
+          $.post("/createProject", $(this).serialize(), function (data) {
+            validData = JSON.parse(data);
+            if (validData.message==-1) {
+              swal("Error","Form field(s) must be filled", "error");
+            } 
+            else if(validData.message==-2)
+            {
+              swal("Error", "Something went wrong !", "error");
+            }
+            else if(validData.message==-3)
+            {
+              swal("Error", "Project with the same name already exist", "error");
+            }
+            else if(validData.message==1)
+            {
+              swal("Error", "Session Expired", "error").then(function(){
+                window.location.href = ("{% url 'sign_In_ULR' %}");
+              });
+            }
+            else {
+              document.getElementById("projectName").value="";
+              swal("Created !","Project created successfully !","success").then(function()
+              {
+                window.location.href = ("{% url 'loadProjects' %}");
+              });
+            }
+            // of course you can do something more fancy with your respone
+          });
+          e.preventDefault();
+        });
+      </script>
+    <!-- Optional JavaScript; choose one of the two! -->
+
+    <!-- Option 1: Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+
+    <!-- Option 2: Separate Popper and Bootstrap JS -->
+    <!--
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
+    -->
+  </body>
+</html>

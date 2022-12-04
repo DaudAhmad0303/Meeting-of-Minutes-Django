@@ -1,0 +1,28 @@
+{% autoescape off %}  
+<!DOCTYPE html>
+<html lang="en" style="margin: 0;
+    padding: 0;">
+<head style="margin: 0;
+    padding: 0;">
+<meta charset="UTF-8" style="margin: 0;
+    padding: 0;">
+<meta http-equiv="X-UA-Compatible" content="IE=edge" style="margin: 0;
+    padding: 0;">
+<meta name="viewport" content="width=device-width, initial-scale=1.0" style="margin: 0;
+    padding: 0;">
+<title style="margin: 0;
+    padding: 0;">Account Activation</title>
+</head>
+<body style="margin: 0;
+    padding: 0;">
+    <div class="containerBody" style="margin:0;padding:2rem;margin-left:2rem;width:80%;margin-top:3rem;border:0.01rem solid rgb(199, 197, 197);">
+        <h4 class="header" style="margin:0;padding:0;font-size:1.2rem; color:black;">Meeting Minutes Genrator</h4>
+        <p class="paragraph" style="margin:0;padding:0;margin-top:1.5rem;font-size:0.9rem;font-family:sans-serif;color:black;margin-bottom:2.2rem;">Lorem ipsum dolor sit amet consectetur adipisicing elit. Architecto assumenda, ipsum aut porro delectus minima, alias iste distinctio explicabo libero consequatur,
+            ullam voluptas! Voluptatibus exercitationem consequatur ullam accusamus numquam email: " <strong style="margin: 0;
+    padding: 0;"><a class="anchorTag" style="margin:0;padding:0;text-decoration:none;color:rgb(106, 106, 167);">{{userEmail}}</a></strong> "
+        </p>
+        <a href="http://{{ domain }}{% url 'activate' uidb64=uid token=token %}" class="myBtn" style="margin:0;padding:0.9rem 2.2rem 0.9rem 2.2rem;text-decoration:none;background-color:rgb(91, 182, 111);margin-top:1.5rem;border-radius:2rem;color:white;margin-left:-2px;">Activate</a>
+    </div>
+</body>
+</html>
+{% endautoescape %}  
