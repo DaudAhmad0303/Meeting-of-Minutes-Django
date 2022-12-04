@@ -1,0 +1,142 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <title>Sign Up | Urdu MoM</title>
+
+    <!-- Style for Contact Number Field -->
+    <link rel="stylesheet" href="{% static '/userAuthentication/build/css/demo.css' %}">
+    <link rel="stylesheet" href="{% static '/userAuthentication/build/css/intlTelInput.css' %}">
+
+    <!-- Font Icon -->
+    <link rel="stylesheet"
+        href="{% static '/userAuthentication/fonts/material-icon/css/material-design-iconic-font.min.css' %}">
+    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-design-iconic-font/2.2.0/css/material-design-iconic-font.min.css"> -->
+
+    <!-- Main css -->
+    <link rel="stylesheet" href="{% static '/userAuthentication/css/style.css' %}">
+</head>
+
+<body>
+
+    <div class="main">
+
+        <!-- Sign up form -->
+        <section class="signup">
+            <div class="container">
+                <div class="signup-content">
+                    <div class="signup-form">
+                        <h2 class="form-title">Sign up</h2>
+                        <form method="POST" action="verify_email" class="register-form" id="form">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label for="firstName"><i class="zmdi zmdi-account material-icons-name"></i></label>
+                                {{form.firstName}}
+                                <!-- <input type="text" name="firstName" id="first_name" placeholder="First Name" required/> -->
+                            </div>
+                            <div class="form-group">
+                                <label for="lastName"><i class="zmdi zmdi-account material-icons-name"></i></label>
+                                {{form.lastName}}
+                                <!-- <input type="text" name="last_name" id="last_name" placeholder="Last Name" required/> -->
+                            </div>
+                            <div class="form-group">
+                                <label for="userEmail"><i class="zmdi zmdi-email material-icons-name"></i></label>
+                                {{form.userEmail}}
+                                <!-- <input type="email" name="email" id="email" placeholder="Your Email" required/> -->
+                            </div>
+                            <div class="form-group">
+                                <label for="contactNumber"><i class="zmdi zmdi-smartphone-android material-icons-name"></i></label>
+                                {{form.contactNumber}}
+                                <!-- <input type="tel" name="contact" id="contact" placeholder="Contact" required/> -->
+                            </div>
+                            <div class="form-group">
+                                <label for="organizationName"><i class="zmdi zmdi-home material-icons-name"></i></label>
+                                {{form.organizationName}}
+                                <!-- <input type="text" name="organization" id="organization" placeholder="Organization"/> -->
+                            </div>
+                            <div class="form-group">
+                                <label for="userPassword"><i class="zmdi zmdi-lock material-icons-name"></i></label>
+                                {{form.userPassword}}
+                                <!-- <input type="password" name="pass" id="pass" placeholder="Password" required/> -->
+                            </div>
+                            <div class="form-group">
+                                <label for="confirmPassword"><i class="zmdi zmdi-lock-outline material-icons-name"></i></label>
+                                {{form.confirmPassword}}
+                                <!-- <input type="password" name="re_pass" id="re_pass" placeholder="Repeat your password" required/> -->
+                            </div>
+                            <div class="form-group">
+                                <input type="checkbox" name="agree-term" id="agree-term" class="agree-term" required />
+                                <label for="agree-term" class="label-agree-term"><span><span></span></span>I agree all
+                                    statements in <a href="#" class="term-service">Terms of service</a></label>
+                            </div>
+                            <div class="form-group form-button">
+                                <input type="submit" name="signup" id="signup" class="form-submit" value="Sign Up">
+
+                            </div>
+                        </form>
+                    </div>
+                    <div class="signup-image">
+                        <figure><img src="{% static 'userAuthentication/images/signup-image.jpg' %}"
+                                alt="sing up image"></figure>
+                        <a href="signIn" class="signup-image-link">I am already member</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+    <script>
+        $("#form").submit(function (e) {
+            <!-- Changing post URL -->
+            $.post("/signup", $(this).serialize(), function (data) {
+                console.log(data);
+                validData = JSON.parse(data);
+                if (validData.message == -1) {
+                    swal("Error", validData.error, "error");
+                }
+                else if (validData.message == -2) {
+                    document.getElementById("confirmPassword").style.border = "1.5px solid red";
+                    swal("Error", "Password does not matches", "error");
+                }
+                else if (validData.message == -3) {
+                    swal("Error", "User with this email already exist", "error");
+                }
+                else {
+                    swal("Sent !", "Activation link sent to: " + validData.email, "success").then(function () {
+                        document.getElementById("id_userEmail").value = '';
+                        document.getElementById("id_userPassword").value = '';
+                        document.getElementById("id_firstName").value = '';
+                        document.getElementById("id_lastName").value = '';
+                        document.getElementById("confirmPassword").value = '';
+                        document.getElementById("id_organizationName").value = '';
+                        document.getElementById("id_contactNumber").value = '';
+                        window.location.href = ("{% url 'sign_In_ULR' %}");
+                    });
+                }
+                // of course you can do something more fancy with your respone
+            });
+            e.preventDefault();
+        });
+    </script>
+
+
+    <!-- JS -->
+
+    <script type="text/javascript" src="{% static 'userAuthentication/build/js/intlTelInput.js' %}"></script>
+    <!-- <script>
+        var input = document.querySelector("#contactNumber");
+        window.intlTelInput(input, {});
+    </script> -->
+
+    <!-- JS -->
+    <script src="{% static '/userAuthentication/vendor/jquery/jquery.min.js' %}"></script>
+    <script src="{% static '/userAuthentication/js/main.js' %}"></script>
+</body>
+
+</html>
